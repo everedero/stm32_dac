@@ -7,8 +7,7 @@
 
 DAC_HandleTypeDef hdac1;
 
-void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
+void Error_Handler(void);
 static void MX_DAC1_Init(void);
 
 int init_dac(void)
@@ -19,8 +18,10 @@ int init_dac(void)
 
 //   HAL_Init();
 //    SystemClock_Config();
-    MX_GPIO_Init();
+//    MX_GPIO_Init();
     MX_DAC1_Init();
+//
+//    DAC1, channel 1 (PA4) is initialized via Zephyr API
 
     while (1)
     {
@@ -34,17 +35,55 @@ int init_dac(void)
 
 void SystemClock_Config(void)
 {
+  /*
+		dac1: dac@40007400 {
+			compatible = "st,stm32-dac";
+			reg = <0x40007400 0x400>;
+			clocks = <&rcc STM32_CLOCK_BUS_APB1 0x20000000>;
+			status = "disabled";
+			#io-channel-cells = <1>;
+		};
+                */
+  /*
+		rcc: rcc@40023800 {
+			compatible = "st,stm32-rcc";
+			#clock-cells = <2>;
+			reg = <0x40023800 0x400>;
+                        */
 }
 
 static void MX_DAC1_Init(void)
 {
+  DAC_ChannelConfTypeDef sConfig = {0};
+
+  /** DAC Initialization
+   * Already done?
+  */
+  hdac1.Instance = DAC1;
+  /*if (HAL_DAC_Init(&hdac1) != HAL_OK)
+  {
+    Error_Handler();
+  }*/
+  /** DAC channel OUT1 config
+  */
+  /*
+  sConfig.DAC_SampleAndHold = DAC_SAMPLEANDHOLD_DISABLE;
+  sConfig.DAC_Trigger = DAC_TRIGGER_NONE;
+  sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
+  sConfig.DAC_ConnectOnChipPeripheral = DAC_CHIPCONNECT_DISABLE;
+  sConfig.DAC_UserTrimming = DAC_TRIMMING_FACTORY;
+  if (HAL_DAC_ConfigChannel(&hdac1, &sConfig, DAC_CHANNEL_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  */
 }
 
 static void MX_GPIO_Init(void)
 {
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOA_CLK_ENABLE();
+  //__HAL_RCC_GPIOA_CLK_ENABLE();
 
 }
 
