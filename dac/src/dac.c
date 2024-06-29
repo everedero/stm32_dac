@@ -78,6 +78,16 @@ if (HAL_DAC_ConfigChannel(&hdac1, &sConfig, DAC_CHANNEL_1) != HAL_OK)
 */
 }
 
+/*
+static void MX_DMA_Init(void)
+{
+
+  __HAL_RCC_DMA1_CLK_ENABLE();
+  HAL_NVIC_SetPriority(DMA1_Channel3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel3_IRQn);
+
+}*/
+
 static void MX_GPIO_Init(void)
 {
 	/* GPIO Ports Clock Enable */

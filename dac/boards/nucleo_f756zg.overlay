@@ -11,3 +11,11 @@
 		pinctrl-0 = <&dac_out1_pa4>;
 		pinctrl-names = "default";
 };
+
+
+//dma1: dma@40026000 {
+//compatible = "st,stm32-dma-v1";
+&dma1 {
+		status = "okay";
+
+};
