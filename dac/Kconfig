@@ -1,0 +1,9 @@
+mainmenu "DAC_APP"
+
+source "Kconfig.zephyr"
+config DAC_APP_STM32
+  default y
+  bool
+  select USE_STM32_HAL_DAC
+  select USE_STM32_HAL_DMA
+  select USE_STM32_HAL_CORTEX

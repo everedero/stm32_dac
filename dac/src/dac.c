@@ -2,13 +2,15 @@
 #include <zephyr/sys/printk.h>
 //#include <zephyr/drivers/dac.h>
 //#include "stm32f7xx_hal.h"
-#include "stm32f7xx_ll_dac.h"
+#include "stm32f7xx_ll_dac.h" // Also called in driver
 #include "stm32f7xx_hal_dac.h"
+#include "stm32f7xx_hal_cortex.h" // for HAL_NVIC EnableIRQ and HAL_NVIC SetPriority
 
 DAC_HandleTypeDef hdac1;
 
 void Error_Handler(void);
 static void MX_DAC1_Init(void);
+static void MX_DMA_Init(void);
 
 int init_dac(void)
 {
@@ -20,14 +22,19 @@ int init_dac(void)
 //	SystemClock_Config();
 //	MX_GPIO_Init();
 	MX_DAC1_Init();
+	MX_DMA_Init();
 //	DAC1, channel 1 (PA4) is initialized via Zephyr API
+	/* Clocks, pinctrl, channel count and resolution
+	 * handled by Zephyr driver in drivers/dac/dac_stm32.c
+	 * */
 
 	while (1)
 	{
 		DAC1->DHR12R1 = DAC_OUT[i++];
 		if(i == 4)
 			i = 0;
-		HAL_Delay(50);
+		//HAL_Delay(50); // STM32 50ms systick delay
+		k_msleep(50);
 	}
 		return 0;
 }
@@ -78,15 +85,17 @@ if (HAL_DAC_ConfigChannel(&hdac1, &sConfig, DAC_CHANNEL_1) != HAL_OK)
 */
 }
 
-/*
+
 static void MX_DMA_Init(void)
 {
+  // DMA1 enabled as a whole, but channel 3 no
 
   __HAL_RCC_DMA1_CLK_ENABLE();
-  HAL_NVIC_SetPriority(DMA1_Channel3_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel3_IRQn);
+  //DMA1_Stream3_IRQn
+  HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
 
-}*/
+}
 
 static void MX_GPIO_Init(void)
 {
