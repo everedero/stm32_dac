@@ -13,6 +13,7 @@ TIM_HandleTypeDef htim2;
 void Error_Handler(void);
 static void MX_DAC1_Init(void);
 static void MX_DMA_Init(void);
+static void MX_TIM2_Init(void);
 
 #define NS  128
 
@@ -39,16 +40,17 @@ int init_dac(void)
 //	MX_GPIO_Init();
 	MX_DAC1_Init();
 	MX_DMA_Init();
+	MX_TIM2_Init();
 //	DAC1, channel 1 (PA4) is initialized via Zephyr API
 	/* Clocks, pinctrl, channel count and resolution
 	 * handled by Zephyr driver in drivers/dac/dac_stm32.c
 	 * */
 
+	HAL_TIM_Base_Start(&htim2);
 	err = HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)Wave_LUT, 128, DAC_ALIGN_12B_R);
 	if (err != HAL_OK) {
 		printk(err);
 	 }
-	HAL_TIM_Base_Start(&htim2);
 
 /*	while (1)
 	{
@@ -123,7 +125,7 @@ static void MX_DAC1_Init(void)
 	hdma_dac1.Parent = &hdac1;
     	//__HAL_LINKDMA(hdac1, DMA_Handle1, hdma_dac1);
 	// Manual trigger source
-	LL_DAC_SetTriggerSource(DAC1, 1, LL_DAC_TRIG_EXT_TIM2_TRGO);
+	//LL_DAC_SetTriggerSource(DAC1, 1, LL_DAC_TRIG_EXT_TIM2_TRGO);
 }
 
 
@@ -147,6 +149,38 @@ static void MX_GPIO_Init(void)
 void Error_Handler(void)
 {
 }
+
+static void MX_TIM2_Init(void)
+{
+	TIM_MasterConfigTypeDef sMasterConfig = {0};
+	TIM_OC_InitTypeDef sConfigOC = {0};
+
+	htim2.Instance = TIM2;
+	htim2.Init.Prescaler = 0;
+	htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
+	htim2.Init.Period = 24000;
+	htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+	htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+	if (HAL_TIM_PWM_Init(&htim2) != HAL_OK)
+	{
+	  Error_Handler();
+	}
+	sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
+	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+	if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
+	{
+	  Error_Handler();
+	}
+	sConfigOC.OCMode = TIM_OCMODE_PWM1;
+	sConfigOC.Pulse = 0;
+	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+	sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
+	if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+	{
+	  Error_Handler();
+	}
+}
+
 
 int run_dac(void)
 {

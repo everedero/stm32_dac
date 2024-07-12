@@ -52,7 +52,9 @@ int main(void)
 	printk("Generating sawtooth signal at DAC channel %d.\n",
 		DAC_CHANNEL_ID);
 	//int dac_dev = 0;
-	ret = dac_write_value(dac_dev, DAC_CHANNEL_ID, 0);
+	//ret = dac_write_value(dac_dev, DAC_CHANNEL_ID, 0);
+	//k_timer_init(&timer2);
+	//k_timer_start(&timer2, K_NO_WAIT, K_MSEC(1));
 	ret = init_dac();
 	ret = run_dac();
 }

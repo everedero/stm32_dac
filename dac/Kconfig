@@ -9,3 +9,4 @@ config DAC_APP_STM32
   select USE_STM32_HAL_DMA
   select USE_STM32_HAL_CORTEX
   select USE_STM32_HAL_TIM
+  select USE_STM32_HAL_TIM_EX
