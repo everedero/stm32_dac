@@ -8,6 +8,7 @@
 
 DAC_HandleTypeDef hdac1;
 DMA_HandleTypeDef hdma_dac1;
+TIM_HandleTypeDef htim2;
 
 void Error_Handler(void);
 static void MX_DAC1_Init(void);
@@ -31,6 +32,7 @@ int init_dac(void)
 		1353, 1449, 1546, 1645, 1745, 1845, 1946, 2047
 	};
 	uint8_t i = 0;
+	uint32_t err = 0;
 
 //	HAL_Init();
 //	SystemClock_Config();
@@ -42,16 +44,20 @@ int init_dac(void)
 	 * handled by Zephyr driver in drivers/dac/dac_stm32.c
 	 * */
 
-//	HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)Wave_LUT, 128, DAC_ALIGN_12B_R);
+	err = HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)Wave_LUT, 128, DAC_ALIGN_12B_R);
+	if (err != HAL_OK) {
+		printk(err);
+	 }
+	HAL_TIM_Base_Start(&htim2);
 
-	while (1)
+/*	while (1)
 	{
 		DAC1->DHR12R1 = DAC_OUT[i++];
 		if(i == 4)
 			i = 0;
 		//HAL_Delay(50); // STM32 50ms systick delay
 		k_msleep(50);
-	}
+	}*/
 		return 0;
 }
 
@@ -89,11 +95,9 @@ static void MX_DAC1_Init(void)
 	/** DAC channel OUT1 config
 	*/
 
-	//sConfig.DAC_SampleAndHold = DAC_SAMPLEANDHOLD_DISABLE;
-	sConfig.DAC_Trigger = DAC_TRIGGER_NONE;
+	//sConfig.DAC_Trigger = DAC_TRIGGER_NONE;
+	sConfig.DAC_Trigger = DAC_TRIGGER_T2_TRGO;
 	sConfig.DAC_OutputBuffer = DAC_OUTPUTBUFFER_ENABLE;
-	//sConfig.DAC_ConnectOnChipPeripheral = DAC_CHIPCONNECT_DISABLE;
-	//sConfig.DAC_UserTrimming = DAC_TRIMMING_FACTORY;
 	if (HAL_DAC_ConfigChannel(&hdac1, &sConfig, DAC_CHANNEL_1) != HAL_OK)
 	{
 	      Error_Handler();
@@ -115,22 +119,22 @@ static void MX_DAC1_Init(void)
 	{
 	  Error_Handler();
 	}
-	// LL_DAC_EnableDMAReq(DAC1, 1);
 	hdac1.DMA_Handle1 = &hdma_dac1;
 	hdma_dac1.Parent = &hdac1;
     	//__HAL_LINKDMA(hdac1, DMA_Handle1, hdma_dac1);
-
+	// Manual trigger source
+	LL_DAC_SetTriggerSource(DAC1, 1, LL_DAC_TRIG_EXT_TIM2_TRGO);
 }
 
 
 static void MX_DMA_Init(void)
 {
-  // DMA1 enabled as a whole, but channel 3 no
+  // DMA1 enabled as a whole, but channel 5 no
 
   __HAL_RCC_DMA1_CLK_ENABLE();
-  //DMA1_Stream3_IRQn
-  HAL_NVIC_SetPriority(DMA1_Stream3_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Stream3_IRQn);
+  //DMA1_Stream5_IRQn
+  //HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 0);
+  //HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
 
 }
 
