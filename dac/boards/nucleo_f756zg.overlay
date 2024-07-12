@@ -19,3 +19,11 @@
 		status = "okay";
 
 };
+
+&timers2 {
+		status = "okay";
+		counter {
+			status = "okay";
+		};
+
+};
