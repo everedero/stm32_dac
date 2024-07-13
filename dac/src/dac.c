@@ -46,11 +46,12 @@ int init_dac(void)
 	 * handled by Zephyr driver in drivers/dac/dac_stm32.c
 	 * */
 
-	HAL_TIM_Base_Start(&htim2);
+
 	err = HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)Wave_LUT, 128, DAC_ALIGN_12B_R);
 	if (err != HAL_OK) {
 		printk(err);
 	 }
+	HAL_TIM_Base_Start(&htim2);
 
 /*	while (1)
 	{
@@ -86,6 +87,8 @@ static void MX_DAC1_Init(void)
 {
 	DAC_ChannelConfTypeDef sConfig = {0};
 
+    /* Peripheral clock enable */
+    __HAL_RCC_DAC_CLK_ENABLE();
 /** DAC Initialization
  * Already done?
 */
@@ -112,10 +115,14 @@ static void MX_DAC1_Init(void)
 	hdma_dac1.Init.Direction = DMA_MEMORY_TO_PERIPH;
 	hdma_dac1.Init.PeriphInc = DMA_PINC_DISABLE;
 	hdma_dac1.Init.MemInc = DMA_MINC_ENABLE;
-	hdma_dac1.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
-	hdma_dac1.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
-	hdma_dac1.Init.Mode = DMA_NORMAL;
-	hdma_dac1.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_dac1.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
+    hdma_dac1.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+    hdma_dac1.Init.Mode = DMA_CIRCULAR;
+	hdma_dac1.Init.Priority = DMA_PRIORITY_HIGH;
+	//hdma_dac1.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+	//hdma_dac1.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+	//hdma_dac1.Init.Mode = DMA_NORMAL;
+	//hdma_dac1.Init.Priority = DMA_PRIORITY_LOW;
 	hdma_dac1.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
 	if (HAL_DMA_Init(&hdma_dac1) != HAL_OK)
 	{
@@ -135,8 +142,8 @@ static void MX_DMA_Init(void)
 
   __HAL_RCC_DMA1_CLK_ENABLE();
   //DMA1_Stream5_IRQn
-  //HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 0);
-  //HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
+  HAL_NVIC_SetPriority(DMA1_Stream5_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Stream5_IRQn);
 
 }
 
@@ -150,22 +157,35 @@ void Error_Handler(void)
 {
 }
 
+void DMA1_Stream5_IRQHandler(void)
+{
+	printk("Hi!");
+  	HAL_DMA_IRQHandler(&hdma_dac1);
+}
+
 static void MX_TIM2_Init(void)
 {
+	printk("TIM2 start\n");
+	TIM_ClockConfigTypeDef sClockSourceConfig = {0};
 	TIM_MasterConfigTypeDef sMasterConfig = {0};
 	TIM_OC_InitTypeDef sConfigOC = {0};
 
 	htim2.Instance = TIM2;
 	htim2.Init.Prescaler = 0;
 	htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-	htim2.Init.Period = 24000;
+	htim2.Init.Period = 1500; // 72 MHz periods / 1500 =  48kHz
 	htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	htim2.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
 	if (HAL_TIM_PWM_Init(&htim2) != HAL_OK)
 	{
 	  Error_Handler();
 	}
-	sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
+	sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+	if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
+	{
+		Error_Handler();
+	}
+  	sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
 	sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
 	if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
 	{
@@ -179,8 +199,9 @@ static void MX_TIM2_Init(void)
 	{
 	  Error_Handler();
 	}
+	// Start clock
+    __HAL_RCC_TIM2_CLK_ENABLE();
 }
-
 
 int run_dac(void)
 {
