@@ -24,3 +24,12 @@ We verified with devmem:
 Be careful to not call init from stm32 hal that are not already called
 by Zephyr kernel automagically.
 
+## West when folder renamed
+
+If you renamed your example-application folder:
+
+    west config -l
+
+Gives you the parameter where the west.yml file inhabits.
+
+    west config manifest.path stm32_dac
