@@ -116,7 +116,7 @@ static void MX_DAC1_Init(void)
 	hdma_dac1.Init.PeriphInc = DMA_PINC_DISABLE;
 	hdma_dac1.Init.MemInc = DMA_MINC_ENABLE;
     hdma_dac1.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
-    hdma_dac1.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
+    hdma_dac1.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
     hdma_dac1.Init.Mode = DMA_CIRCULAR;
 	hdma_dac1.Init.Priority = DMA_PRIORITY_HIGH;
 	//hdma_dac1.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
