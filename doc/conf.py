@@ -35,6 +35,6 @@ intersphinx_mapping = {'zephyr': ('https://docs.zephyrproject.org/latest/', None
 # WARNING: please, check breathe maintainership status before using this
 # extension in production!
 
-breathe_projects = {'example-application': '_build_doxygen/xml'}
-breathe_default_project = 'example-application'
+breathe_projects = {'stm32_dac': '_build_doxygen/xml'}
+breathe_default_project = 'stm32_dac'
 breathe_default_members = ('members', )

@@ -53,7 +53,11 @@ int init_dac(void)
 	 }
 	HAL_TIM_Base_Start(&htim2);
 
-/*	while (1)
+	printk("IRQ 0x%x\n", arch_irq_is_enabled(16));
+	printk("IRQ 0x%x\n", arch_irq_is_enabled(15));
+
+/*	k_msleep(50);
+	while (1)
 	{
 		DAC1->DHR12R1 = DAC_OUT[i++];
 		if(i == 4)
@@ -61,9 +65,18 @@ int init_dac(void)
 		//HAL_Delay(50); // STM32 50ms systick delay
 		k_msleep(50);
 	}*/
+/*	while(1)
+	{
+		err = HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, DAC_ALIGN_12B_R, Wave_LUT);
+		k_msleep(1);
+	}*/
 		return 0;
 }
 
+void HAL_DAC_ConvHalfCpltCallbackCh1(DAC_HandleTypeDef *hdac)
+{
+	printk("Yo!");
+}
 void SystemClock_Config(void)
 {
 /*
@@ -155,6 +168,7 @@ static void MX_GPIO_Init(void)
 
 void Error_Handler(void)
 {
+	printk("Err\n");
 }
 
 void DMA1_Stream5_IRQHandler(void)
@@ -162,6 +176,23 @@ void DMA1_Stream5_IRQHandler(void)
 	printk("Hi!");
   	HAL_DMA_IRQHandler(&hdma_dac1);
 }
+
+void TIM2_DAC_IRQHandler(void)
+{
+	printk("Hi!");
+  	HAL_DMA_IRQHandler(&hdma_dac1);
+}
+
+void HAL_DAC_ErrorCallbackCh1(DAC_HandleTypeDef* hdac)
+{
+	printk("Ouille!");
+}
+
+void HAL_DAC_DMAUnderrunCallbackCh1(DAC_HandleTypeDef* hdac)
+{
+	printk("Underrun");
+}
+
 
 static void MX_TIM2_Init(void)
 {
