@@ -8,14 +8,17 @@ manifest:
   remotes:
     - name: zephyrproject-rtos
       url-base: https://github.com/zephyrproject-rtos
+    - name: eve-zephyr
+      url-base: https://github.com/everedero
 
   projects:
     - name: zephyr
-      remote: zephyrproject-rtos
-      revision: main
+      remote: eve-zephyr
+      revision: 86834a26144fdc5a3a93c1ea39437c6b3c8fcf4e
       import:
         # By using name-allowlist we can clone only the modules that are
         # strictly needed by the application.
         name-allowlist:
           - cmsis      # required by the ARM port
+          - cmsis_6    # required by Zephyr 4.4 for Cortex-M CMSIS headers
           - hal_stm32  # required by the nucleo_f756zg board (STM32 based)
