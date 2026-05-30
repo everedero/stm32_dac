@@ -10,6 +10,7 @@
 #include <st/f7/stm32f730z8tx-pinctrl.dtsi>
 #include "arduino_r3_connector.dtsi"
 #include <zephyr/dt-bindings/input/input-event-codes.h>
+#include <zephyr/dt-bindings/display/panel.h>
 
 / {
 	model = "FAH V3 STM32F730Z8";
@@ -76,7 +77,7 @@
 
 	mipi_dbi {
 		compatible = "zephyr,mipi-dbi-spi";
-		dc-gpios = <&gpioe 11 GPIO_ACTIVE_LOW>;
+		dc-gpios = <&gpioe 11 GPIO_ACTIVE_HIGH>;
 		reset-gpios = <&gpioe 13 GPIO_ACTIVE_LOW>;
 		spi-dev = <&spi4>;
 		#address-cells = <1>;
@@ -87,7 +88,7 @@
 			compatible = "ilitek,ili9341";
 			mipi-max-frequency = <6000000>; /* Max 50 Mbit/s */
 			reg = <0>;
-			pixel-format = <0>;//RGB666
+			pixel-format = <PANEL_PIXEL_FORMAT_RGB_565X>;
 			rotation = <0>;
 			width = <240>;
 			height = <320>;
