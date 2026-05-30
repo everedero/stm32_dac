@@ -14,7 +14,7 @@ manifest:
   projects:
     - name: zephyr
       remote: eve-zephyr
-      revision: 86834a26144fdc5a3a93c1ea39437c6b3c8fcf4e
+      revision: 9888a5b4559e308ec7ff9dfb3da6b3d4d267f44c
       import:
         # By using name-allowlist we can clone only the modules that are
         # strictly needed by the application.
