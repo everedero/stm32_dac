@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: MIT
+
+config PTTTL
+	bool "PTTTL/RTTTL ringtone parser and sample generator"
+	help
+	  Enable the eriknyquist/ptttl library (MIT). Parses RTTTL/PTTTL ringtone
+	  strings and generates int16_t PCM audio samples with no dynamic memory
+	  allocation. Requires only string.h (memset) and stdint.h.
