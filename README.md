@@ -57,6 +57,52 @@ streams PCM samples to the DAC.  The Tetris theme loops continuously.
 west build -b fahv3 fah_dac/ptttl_audio
 ```
 
+### midi\_audio - Standard MIDI File player
+
+Parses a Standard MIDI File (Format 0 or 1) embedded in flash and plays it
+back using a polyphonic DDS sine synthesiser (8 voices, linear
+attack/release envelopes, velocity-scaled amplitude, tempo-change aware).
+
+**Prepare the MIDI data file** from any `.mid` file:
+
+```bash
+xxd -i your_song.mid > fah_dac/midi_audio/src/midi_data.c
+# xxd names the array after the filename; rename to match the expected symbols:
+sed -i 's/^unsigned char .*/const uint8_t midi_data[] = {/' fah_dac/midi_audio/src/midi_data.c
+sed -i 's/^unsigned int .*/const uint32_t midi_data_len = sizeof(midi_data);/' fah_dac/midi_audio/src/midi_data.c
+```
+
+Then build and flash:
+
+```bash
+west build -b fahv3 fah_dac/midi_audio --build-dir fah_dac/build_midi_audio
+west flash --build-dir fah_dac/build_midi_audio
+```
+
+`midi_data.c` is intentionally **not tracked in git** — generate it locally
+from the MIDI file of your choice.  A minimal C major scale test file can be
+regenerated with the Python snippet in `scripts/` or any SMF-capable tool.
+
+### dac\_loopback - DAC→ADC loopback self-test
+
+Generates a sine wave on PA4 and reads it back on PA5 (requires a solder
+wire between the two test points).  Reports PASS/FAIL against theoretical
+amplitude, RMS, crest factor, frequency, and DC offset.
+
+```bash
+west build -b fahv3 fah_dac/dac_loopback --build-dir fah_dac/build_dac_loopback
+west flash --build-dir fah_dac/build_dac_loopback
+```
+
+Tune the three parameters at the top of `dac_loopback/src/main.c` to match
+any audio signal you want to verify:
+
+```c
+#define SINE_FREQ_HZ    440
+#define SINE_AMPLITUDE  200
+#define TOLERANCE_PCT     5
+```
+
 ## Flashing
 
 ```bash

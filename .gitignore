@@ -14,3 +14,6 @@ __pycache__/
 
 # docs
 /doc/_build*
+
+# generated from local MIDI files — not tracked
+midi_audio/src/midi_data.c
