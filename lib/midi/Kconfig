@@ -1,0 +1,9 @@
+# SPDX-License-Identifier: MIT
+
+config MIDI
+	bool "Minimal SMF MIDI parser and polyphonic DDS synthesizer"
+	help
+	  Enable the in-tree MIDI library. Parses Standard MIDI Files (Format 0
+	  and 1) from a raw byte array and synthesizes polyphonic sine-wave audio
+	  as int16_t PCM with no dynamic memory allocation. Requires math.h
+	  (sinf, powf) — enable CONFIG_FPU for hardware acceleration.

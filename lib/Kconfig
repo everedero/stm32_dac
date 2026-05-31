@@ -5,5 +5,6 @@ menu "Custom libraries"
 
 rsource "custom/Kconfig"
 rsource "ptttl/Kconfig"
+rsource "midi/Kconfig"
 
 endmenu

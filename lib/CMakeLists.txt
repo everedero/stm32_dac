@@ -2,3 +2,4 @@
 
 add_subdirectory_ifdef(CONFIG_CUSTOM custom)
 add_subdirectory_ifdef(CONFIG_PTTTL ptttl)
+add_subdirectory_ifdef(CONFIG_MIDI  midi)
