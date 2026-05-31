@@ -70,10 +70,14 @@ static void tx_done(const struct device *dev, void *user_data)
 
 	callback_count++;
 
-	/* Toggle buffer and fill the one that just finished */
-	active_buf ^= 1;
+	/*
+	 * active_buf is the buffer that just finished playing; refill it and
+	 * pre-queue it for the transfer after next.  The driver has already
+	 * reloaded the other buffer (pre-queued before this callback fired).
+	 */
 	fill_buffer(audio_bufs[active_buf]);
 	audio_codec_write(dev, (uint8_t *)audio_bufs[active_buf], BLOCK_BYTES);
+	active_buf ^= 1;
 }
 
 int main(void)
@@ -111,13 +115,23 @@ int main(void)
 		return ret;
 	}
 
-	/* Prime buffer 0 into DMA (transfer starts when start() enables the timer) */
+	/*
+	 * Double-prime: write buf0 (starts DMA) then write buf1 (pre-queued).
+	 * When buf0 completes the driver reloads buf1 at ISR time before firing
+	 * tx_done, so the inter-buffer gap is only IRQ latency.
+	 */
 	fill_buffer(audio_bufs[0]);
+	fill_buffer(audio_bufs[1]);
 	active_buf = 0;
 
 	ret = audio_codec_write(codec_dev, (uint8_t *)audio_bufs[0], BLOCK_BYTES);
 	if (ret < 0) {
 		LOG_ERR("audio_codec_write (prime) failed: %d", ret);
+		return ret;
+	}
+	ret = audio_codec_write(codec_dev, (uint8_t *)audio_bufs[1], BLOCK_BYTES);
+	if (ret < 0) {
+		LOG_ERR("audio_codec_write (pre-queue) failed: %d", ret);
 		return ret;
 	}
 
