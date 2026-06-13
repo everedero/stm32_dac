@@ -40,7 +40,7 @@
 	channel@7 {
 		reg = <7>;
 		zephyr,gain = "ADC_GAIN_1";
-		zephyr,reference = "ADC_REF_INTERNAL";
+		zephyr,reference = "ADC_REF_EXTERNAL0";
 		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
 		zephyr,resolution = <12>;
 	};

@@ -88,9 +88,10 @@ static const struct device *adc_dev = DEVICE_DT_GET(DT_NODELABEL(adc0));
 
 static const struct adc_channel_cfg adc_ch_cfg = {
 	.gain             = ADC_GAIN_1,
-	.reference        = ADC_REF_INTERNAL,
+	.reference        = ADC_REF_EXTERNAL0,  /* SAM ADC only supports external ref */
 	.acquisition_time = ADC_ACQ_TIME_DEFAULT,
 	.channel_id       = ADC_CHANNEL_ID,
+	.input_positive   = ADC_CHANNEL_ID,     /* must equal channel_id for single-ended */
 };
 
 static bool in_tol(float val, float exp)
