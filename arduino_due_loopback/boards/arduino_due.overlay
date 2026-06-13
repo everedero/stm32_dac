@@ -1,0 +1,47 @@
+/*
+ * Arduino Due audio DAC loopback overlay.
+ *
+ * Hardware wiring: DAC1 (PB16) → A0 (PA16 / AD7) loopback wire.
+ */
+
+/ {
+	aliases {
+		codec0 = &dacc_audio1;
+	};
+};
+
+/* TC0 channel 0 used as 48 kHz DACC trigger */
+&tc0 {
+	status = "okay";
+};
+
+&dacc {
+	status = "okay";
+
+	dacc_audio1: dacc-audio {
+		compatible = "atmel,sam-dacc-audio";
+		atmel,timer = <&tc0>;
+		atmel,tc-channel = <0>;
+		atmel,trig-sel = <1>;
+		pinctrl-0 = <&dacc_default>;
+		pinctrl-names = "default";
+		status = "okay";
+	};
+};
+
+/* PA16 (A0 header) is already in adc0_default pinctrl as PA16X_ADC_AD7 */
+&adc0 {
+	status = "okay";
+	pinctrl-0 = <&adc0_default>;
+	pinctrl-names = "default";
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	channel@7 {
+		reg = <7>;
+		zephyr,gain = "ADC_GAIN_1";
+		zephyr,reference = "ADC_REF_INTERNAL";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,resolution = <12>;
+	};
+};

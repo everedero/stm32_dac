@@ -21,4 +21,5 @@ manifest:
         name-allowlist:
           - cmsis      # required by the ARM port
           - cmsis_6    # required by Zephyr 4.4 for Cortex-M CMSIS headers
+          - hal_atmel  # required by Arduino Due (SAM3X8E)
           - hal_stm32  # required by the nucleo_f756zg board (STM32 based)
