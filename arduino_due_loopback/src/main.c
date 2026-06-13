@@ -25,7 +25,7 @@ LOG_MODULE_REGISTER(arduino_due_loopback, LOG_LEVEL_INF);
 /* ── User-tunable parameters ─────────────────────────────────────────────── */
 
 #define SINE_FREQ_HZ    440
-#define SINE_AMPLITUDE  200
+#define SINE_AMPLITUDE  2047 /*200*/
 #define TOLERANCE_PCT   5
 
 /* ── DAC / sine generator ────────────────────────────────────────────────── */
