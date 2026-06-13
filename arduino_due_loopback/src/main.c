@@ -76,8 +76,13 @@ static void tx_done(const struct device *dev, void *user_data)
 #define CAPTURE_SAMPLES     256
 #define ADC_INTER_SAMPLE_US 100U
 
-#define EXP_P2P    (2.0f * SINE_AMPLITUDE)
-#define EXP_RMS    ((float)SINE_AMPLITUDE / 1.41421356f)
+/*
+ * SAM3X8E DACC output range is 1/6–5/6 ADVREF, so ADC reads back 2/3 of the
+ * DAC value swing.  Scale the expected p2p and rms accordingly.
+ */
+#define DAC_TO_ADC_SCALE  (2.0f / 3.0f)
+#define EXP_P2P    (2.0f * SINE_AMPLITUDE * DAC_TO_ADC_SCALE)
+#define EXP_RMS    ((float)SINE_AMPLITUDE * DAC_TO_ADC_SCALE / 1.41421356f)
 #define EXP_CREST  1.41421356f
 #define EXP_MEAN   ((float)DAC_MIDPOINT)
 #define EXP_FREQ   ((float)SINE_FREQ_HZ)
